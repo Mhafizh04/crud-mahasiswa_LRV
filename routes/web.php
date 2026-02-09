@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\MahasiswaController;  
+use App\Http\Controllers\MataKuliahController;
 
-// Route untuk CRUD Mahasiswa
 Route::resource('mahasiswa', MahasiswaController::class);
+Route::resource('matakuliah', MataKuliahController::class);
 
-// Route default Laravel
 Route::get('/', function () {
     return view('welcome');
 });

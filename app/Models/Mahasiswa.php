@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mahasiswa extends Model
 {
-    // Tentukan nama tabel sesuai database
+    // Nama tabel
     protected $table = 'mahasiswas';
 
-    // Field yang boleh diisi
+    // Primary key
+    protected $primaryKey = 'nim';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    // Field yang bisa diisi
     protected $fillable = [
         'nim',
         'nama',
@@ -17,12 +22,6 @@ class Mahasiswa extends Model
         'matakuliah'
     ];
 
-    // Set primary key = nim
-    protected $primaryKey = 'nim';
-
-    // Karena bukan auto increment
-    public $incrementing = false;
-
-    // Tipe primary key string
-    protected $keyType = 'string';
+    // Nonaktifkan timestamps
+    public $timestamps = false;
 }
