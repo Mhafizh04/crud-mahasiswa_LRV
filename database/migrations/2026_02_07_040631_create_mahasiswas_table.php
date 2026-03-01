@@ -6,25 +6,36 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('mahasiswa', function (Blueprint $table) {
-            $table->string('nim')->primary();  // NIM sebagai primary key
+        Schema::create('mahasiswas', function (Blueprint $table) {
+
+            // Primary Key
+            $table->string('nim')->primary();
+
             $table->string('nama');
             $table->string('kelas');
-            $table->string('matakuliah');
-            // TIDAK ADA $table->id() atau $table->timestamps()
+
+            // Foreign Key ke MataKuliah
+            $table->string('kode_mk');
+
+            // User yang membuat data
+            $table->foreignId('dibuat_oleh')->nullable()
+                  ->constrained('users')
+                  ->nullOnDelete();
+
+            $table->timestamps();
+
+            // Foreign key relasi ke mata_kuliahs
+            $table->foreign('kode_mk')
+                  ->references('kode_mk')
+                  ->on('mata_kuliahs')
+                  ->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('mahasiswa');
+        Schema::dropIfExists('mahasiswas');
     }
 };

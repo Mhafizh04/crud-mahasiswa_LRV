@@ -1,92 +1,107 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Data Mahasiswa</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+@extends('layouts.app')
 
-<div class="container mt-5">
+@section('content')
+<div class="container mt-4">
 
-    <h2 class="mb-4">Data Mahasiswa</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Data Mahasiswa</h4>
 
-    {{-- Pesan sukses --}}
+        <div>
+            <a href="{{ route('mahasiswa.cetak_pdf') }}" 
+               class="btn btn-danger me-2">
+                Cetak PDF
+            </a>
+
+            <a href="{{ route('mahasiswa.create') }}" 
+               class="btn btn-primary">
+                + Tambah Mahasiswa
+            </a>
+        </div>
+    </div>
+
+    {{-- Alert Success --}}
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert alert-success">
             {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    {{-- Pesan error validasi --}}
-    @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show">
-            <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mb-0">
+                    <thead style="background-color:#212529; color:white;">
+                        <tr class="text-center">
+                            <th>NIM</th>
+                            <th>Nama</th>
+                            <th>Kelas</th>
+                            <th>Mata Kuliah</th>
+                            <th>SKS</th>
+                            <th>Semester</th>
+                            <th>Dibuat Oleh</th>
+                            <th width="150">Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($mahasiswas as $m)
+                        <tr>
+                            <td>{{ $m->nim }}</td>
+                            <td>{{ $m->nama }}</td>
+                            <td>{{ $m->kelas }}</td>
+
+                            <td>
+                                {{ optional($m->matakuliah)->nama_mk ?? '-' }}
+                            </td>
+
+                            <td class="text-center">
+                                {{ optional($m->matakuliah)->sks ?? '-' }}
+                            </td>
+
+                            <td class="text-center">
+                                {{ optional($m->matakuliah)->semester ?? '-' }}
+                            </td>
+
+                            <td class="text-center">
+                                {{ $m->user->name ?? 'Admin' }}
+                            </td>
+
+                            <td class="text-center">
+
+                                <a href="{{ route('mahasiswa.edit',$m->id) }}" 
+                                   class="btn btn-warning btn-sm">
+                                   Edit
+                                </a>
+
+                                <form action="{{ route('mahasiswa.destroy',$m->id) }}" 
+                                      method="POST" 
+                                      style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Yakin hapus data?')">
+                                        Delete
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="text-center p-3">
+                                Data mahasiswa belum tersedia
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+
+                </table>
+            </div>
+
         </div>
-    @endif
-
-    {{-- Tombol tambah --}}
-    <a href="{{ route('mahasiswa.create') }}" class="btn btn-primary mb-3">
-        + Tambah Mahasiswa
-    </a>
-
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>NIM</th>
-                <th>Nama</th>
-                <th>Kelas</th>
-                <th>Mata Kuliah</th>
-                <th width="200">Aksi</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @forelse($mahasiswas ?? [] as $mahasiswa)
-            <tr>
-                <td>{{ $mahasiswa->nim }}</td>
-                <td>{{ $mahasiswa->nama }}</td>
-                <td>{{ $mahasiswa->kelas }}</td>
-                <td>{{ $mahasiswa->matakuliah }}</td>
-                <td>
-                    <a href="{{ route('mahasiswa.edit', $mahasiswa->nim) }}"
-                        class="btn btn-warning btn-sm">
-                        Edit
-                    </a>
-
-                    <form action="{{ route('mahasiswa.destroy', $mahasiswa->nim) }}"
-                          method="POST"
-                          style="display:inline">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-danger btn-sm"
-                            onclick="return confirm('Yakin mau hapus data?')">
-                            Hapus
-                        </button>
-                    </form>
-                </td>
-            </tr>
-
-            @empty
-            <tr>
-                <td colspan="5" class="text-center">
-                    Belum ada data mahasiswa
-                </td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+    </div>
 
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endsection

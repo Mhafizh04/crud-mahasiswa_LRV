@@ -1,30 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Mata Kuliah</title>
+    <title>Data Mata Kuliah</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body style="background-color:#f2f2f2;">
 
-<h2>Edit Mata Kuliah</h2>
+<div class="container mt-5">
 
-<form action="{{ route('matakuliah.update',$matakuliah->kode_mk) }}" method="POST">
-    @csrf
-    @method('PUT')
+    <h4 class="mb-3">Data Mata Kuliah</h4>
 
-    Kode MK : <br>
-    <input type="text" name="kode_mk" value="{{ $matakuliah->kode_mk }}" readonly><br><br>
+    <a href="{{ route('matakuliah.create') }}" class="btn btn-primary mb-3">
+        Tambah Mata Kuliah
+    </a>
 
-    Nama MK : <br>
-    <input type="text" name="nama_mk" value="{{ $matakuliah->nama_mk }}"><br><br>
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
 
-    SKS : <br>
-    <input type="number" name="sks" value="{{ $matakuliah->sks }}"><br><br>
+    <table class="table table-bordered bg-white">
+        <thead>
+            <tr>
+                <th>Kode MK</th>
+                <th>Nama MK</th>
+                <th>SKS</th>
+                <th>Semester</th>
+                <th width="170">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+        @forelse($data as $row)
+            <tr>
+                <td>{{ $row->kode_mk }}</td>
+                <td>{{ $row->nama_mk }}</td>
+                <td>{{ $row->sks }}</td>
+                <td>{{ $row->semester }}</td>
+                <td>
+                    {{-- EDIT --}}
+                    <a href="{{ route('matakuliah.edit', $row->kode_mk) }}" 
+                       class="btn btn-warning btn-sm">
+                        Edit
+                    </a>
 
-    Semester : <br>
-    <input type="number" name="semester" value="{{ $matakuliah->semester }}"><br><br>
+                    {{-- DELETE --}}
+                    <form action="{{ route('matakuliah.destroy', $row->kode_mk) }}" 
+                          method="POST" 
+                          style="display:inline;"
+                          onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Hapus
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="5" class="text-center">
+                    Data tidak tersedia
+                </td>
+            </tr>
+        @endforelse
+        </tbody>
+    </table>
 
-    <button type="submit">Update</button>
-</form>
+</div>
 
 </body>
 </html>

@@ -2,67 +2,119 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\MataKuliah;
+use App\Models\Mahasiswa;
+use Illuminate\Http\Request;
 
 class MataKuliahController extends Controller
 {
-    // TAMPILKAN SEMUA DATA
+    /*
+    |--------------------------------------------------------------------------
+    | INDEX
+    |--------------------------------------------------------------------------
+    */
     public function index()
     {
-        $matakuliahs = MataKuliah::all();
-        return view('matakuliah.index', compact('matakuliahs'));
+        $mataKuliahs = MataKuliah::all();
+        return view('matakuliah.index', compact('mataKuliahs'));
     }
 
-    // FORM TAMBAH DATA
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE
+    |--------------------------------------------------------------------------
+    */
     public function create()
     {
         return view('matakuliah.create');
     }
 
-    // SIMPAN DATA
+    /*
+    |--------------------------------------------------------------------------
+    | STORE
+    |--------------------------------------------------------------------------
+    */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'kode_mk' => 'required|string|max:10|unique:mata_kuliahs,kode_mk',
-            'nama_mk' => 'required|string|max:100',
-            'sks' => 'required|integer|min:1|max:6',
-            'semester' => 'required|integer|min:1|max:8',
+        $request->validate([
+            'kode_mk'  => 'required|unique:mata_kuliahs,kode_mk',
+            'nama_mk'  => 'required',
+            'sks'      => 'required|integer',
+            'semester' => 'required|integer',
         ]);
 
-        MataKuliah::create($validated);
+        MataKuliah::create($request->all());
+
         return redirect()->route('matakuliah.index')
-            ->with('success', 'Data berhasil ditambahkan');
+            ->with('success', 'Mata kuliah berhasil ditambahkan');
     }
 
-    // FORM EDIT
-    public function edit($kode_mk)
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW
+    |--------------------------------------------------------------------------
+    */
+    public function show(MataKuliah $matakuliah)
     {
-        $matakuliah = MataKuliah::findOrFail($kode_mk);
+        return view('matakuliah.show', compact('matakuliah'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT
+    |--------------------------------------------------------------------------
+    */
+    public function edit(MataKuliah $matakuliah)
+    {
         return view('matakuliah.edit', compact('matakuliah'));
     }
 
-    // UPDATE DATA
-    public function update(Request $request, $kode_mk)
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE
+    |--------------------------------------------------------------------------
+    */
+    public function update(Request $request, MataKuliah $matakuliah)
     {
-        $matakuliah = MataKuliah::findOrFail($kode_mk);
-
-        $validated = $request->validate([
-            'nama_mk' => 'required|string|max:100',
-            'sks' => 'required|integer|min:1|max:6',
-            'semester' => 'required|integer|min:1|max:8',
+        $request->validate([
+            'nama_mk'  => 'required',
+            'sks'      => 'required|integer',
+            'semester' => 'required|integer',
         ]);
 
-        $matakuliah->update($validated);
+        $matakuliah->update($request->all());
+
         return redirect()->route('matakuliah.index')
             ->with('success', 'Data berhasil diperbarui');
     }
 
-    // HAPUS DATA
-    public function destroy($kode_mk)
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE
+    |--------------------------------------------------------------------------
+    */
+    public function destroy(MataKuliah $matakuliah)
     {
-        MataKuliah::findOrFail($kode_mk)->delete();
+        $matakuliah->delete();
+
         return redirect()->route('matakuliah.index')
             ->with('success', 'Data berhasil dihapus');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | MENAMPILKAN MAHASISWA YANG MENGAMBIL MATA KULIAH
+    |--------------------------------------------------------------------------
+    */
+    public function mahasiswa($kode_mk)
+    {
+        // Ambil data mata kuliah berdasarkan kode_mk
+        $mataKuliah = MataKuliah::where('kode_mk', $kode_mk)->firstOrFail();
+
+        // Ambil mahasiswa yang mengambil mata kuliah tersebut
+        // (Pastikan di tabel mahasiswa ada field kode_mk)
+        $mahasiswas = Mahasiswa::where('kode_mk', $kode_mk)->get();
+
+        return view('matakuliah.mahasiswa', compact('mataKuliah', 'mahasiswas'));
     }
 }
